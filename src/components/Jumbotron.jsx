@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Login = () => {
+const Jumbotron = () => {
   return (
     <section>
       
@@ -8,4 +8,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Jumbotron
