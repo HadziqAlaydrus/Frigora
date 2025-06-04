@@ -1,10 +1,11 @@
 import React from 'react'
+import Jumbotron from '../components/Jumbotron'
 
 const Home = () => {
   return (
-    <div>
-      
-    </div>
+    <section className='min h-screen'>
+      <Jumbotron/>
+    </section>
   )
 }
 

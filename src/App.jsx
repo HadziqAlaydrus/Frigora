@@ -23,7 +23,6 @@ function Layout({children}) {
 }
 
 function App() {
-
   return (
     <>
       <Router>

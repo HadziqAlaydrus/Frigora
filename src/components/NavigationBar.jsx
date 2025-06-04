@@ -9,11 +9,13 @@ const NavigationBar = ({ user_id, onSearchResult }) => {
   const handleSearch = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/food/search/${user_id}/${searchTerm}`
+        `http://localhost:5000/api/food/search/${user_id}/${searchTerm}`,
+        console.log(`Search URL: http://localhost:5000/api/food/search/${user_id}/${searchTerm}`)
       );
       onSearchResult(res.data);
     } catch (error) {
-      console.log("Search error:", error);
+      console.error("Search failed:", error.response?.data || error.message);
+
     }
   };
 
@@ -63,7 +65,7 @@ const NavigationBar = ({ user_id, onSearchResult }) => {
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               <li>
-                <a className="justify-between">Login</a>
+                <Link to="/login" className="justify-between">Login</Link>
               </li>
             </ul>
           </div>
