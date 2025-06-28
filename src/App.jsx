@@ -10,7 +10,7 @@ import FormStorage from './pages/FormStorage'
 import Storage from './pages/Storage'
 import UpdatePage from './pages/UpdatePage'
 import Report from './pages/Report'
-
+import ProtectedRoute from './components/ProtectedRoute' // ⬅️ Tambahkan ini
 
 function Layout({children}) {
   return (
@@ -24,19 +24,47 @@ function Layout({children}) {
 
 function App() {
   return (
-    <>
-      <Router>
-        <Routes>
-          <Route path='/' element={<Layout><Home/></Layout>}></Route>
-          <Route path='/login' element={<Layout><LoginPage/></Layout>}></Route>
-          <Route path='/signup' element={<Layout><SignupPage/></Layout>}></Route>
-          <Route path='/form' element={<Layout><FormStorage/></Layout>}></Route>
-          <Route path='/report' element={<Layout><Report/></Layout>}></Route>
-          <Route path='/storage' element={<Layout><Storage/></Layout>}></Route>
-          <Route path='/:id/update' element={<Layout><UpdatePage/></Layout>}></Route>
-        </Routes>
-      </Router>
-    </>
+    <Router>
+      <Routes>
+        <Route path='/' element={<Layout><Home/></Layout>} />
+        <Route path='/login' element={<Layout><LoginPage/></Layout>} />
+        <Route path='/signup' element={<Layout><SignupPage/></Layout>} />
+        
+        {/* ⛔ Protected Routes */}
+        <Route 
+          path='/form' 
+          element={
+            <ProtectedRoute>
+              <Layout><FormStorage/></Layout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/report' 
+          element={
+            <ProtectedRoute>
+              <Layout><Report/></Layout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/storage' 
+          element={
+            <ProtectedRoute>
+              <Layout><Storage/></Layout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path='/update/:id' 
+          element={
+            <ProtectedRoute>
+              <Layout><UpdatePage/></Layout>
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+    </Router>
   )
 }
 

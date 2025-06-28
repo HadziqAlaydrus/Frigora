@@ -1,7 +1,35 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/users/login", formData);
+
+      // ✅ Simpan token dan nama user di localStorage
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user_name", res.data.name);
+
+      // ✅ Arahkan ke halaman storage
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || "Login failed");
+    }
+  };
+
   return (
     <section className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="flex bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-2xl overflow-hidden mx-auto max-w-xs lg:max-w-3xl w-full transition-all duration-300 hover:shadow-xl dark:hover:shadow-2xl">
@@ -37,15 +65,18 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gray-700 dark:text-gray-300 text-xs font-medium mb-1">
                 Email Address
               </label>
               <input
-                className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-3 block w-full appearance-none transition text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                name="email"
                 type="email"
                 placeholder="you@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-3 block w-full appearance-none transition text-sm placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
 
@@ -54,18 +85,26 @@ const Login = () => {
                 Password
               </label>
               <input
-                className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-3 block w-full appearance-none transition text-sm placeholder-gray-400 dark:placeholder-gray-500"
+                name="password"
                 type="password"
                 placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 border border-gray-200 dark:border-gray-600 rounded-lg py-2.5 px-3 block w-full appearance-none transition text-sm placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
-          </div>
 
-          <div className="mt-6">
-            <button className="bg-blue-600 dark:bg-blue-500 text-white font-medium py-2.5 px-4 w-full rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors text-sm">
-              Sign in
-            </button>
-          </div>
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                className="bg-blue-600 dark:bg-blue-500 text-white font-medium py-2.5 px-4 w-full rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors text-sm"
+              >
+                Sign in
+              </button>
+            </div>
+          </form>
 
           <div className="mt-4 text-center">
             <p className="text-xs text-gray-600 dark:text-gray-400">

@@ -1,23 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 
-// Ambil userId dari token
-const getUserIdFromToken = () => {
-  const token = localStorage.getItem("token")
-  if (!token) return null
+const UpdateForm = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
 
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.id
-  } catch (err) {
-    console.error("Invalid token:", err)
-    return null
-  }
-}
-
-const StorageForm = () => {
   const [formData, setFormData] = useState({
     foodName: "",
     category: "",
@@ -29,20 +19,33 @@ const StorageForm = () => {
 
   const [userId, setUserId] = useState(null)
 
-  useEffect(() => {
-    const id = getUserIdFromToken()
-    if (id) {
-      setUserId(id)
-    } else {
-      alert("User belum login.")
-    }
-  }, [])
-
-  const categories = [
-    "Protein","Vegetables","Fruits","Fast Food","Frozen Food"
-  ]
-
+  const categories = ["Protein", "Vegetables", "Fruits", "Fast Food", "Frozen Food"]
   const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "botol", "kaleng", "sachet", "bungkus"]
+
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id")
+    if (storedUserId) setUserId(parseInt(storedUserId))
+
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/food/${id}`)
+        const data = res.data
+        setFormData({
+          foodName: data.name,
+          category: data.category,
+          quantity: data.quantity,
+          unit: data.unit,
+          location: data.location,
+          expiredDate: data.expired_date ? data.expired_date.split("T")[0] : "",
+        })
+      } catch (err) {
+        console.error("Gagal memuat data:", err)
+        alert("Gagal memuat data makanan.")
+      }
+    }
+
+    if (id) fetchData()
+  }, [id])
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -53,15 +56,8 @@ const StorageForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (!userId) {
-      alert("User ID tidak ditemukan. Pastikan sudah login.")
-      return
-    }
-
     try {
-      const response = await axios.post("http://localhost:5000/api/food", {
-        users_id: userId,
+      await axios.put(`http://localhost:5000/api/food/${id}`, {
         name: formData.foodName,
         category: formData.category,
         quantity: formData.quantity,
@@ -69,13 +65,11 @@ const StorageForm = () => {
         location: formData.location,
         expired_date: formData.expiredDate || null,
       })
-
-      console.log("Data berhasil disimpan:", response.data)
-      alert("Data berhasil disimpan!")
-      handleReset()
-    } catch (error) {
-      console.error("Gagal menyimpan data:", error)
-      alert("Gagal menyimpan data. Silakan cek kembali.")
+      alert("Data berhasil diperbarui!")
+      navigate("/storage") // redirect ke halaman storage
+    } catch (err) {
+      console.error("Gagal update:", err)
+      alert("Gagal memperbarui data.")
     }
   }
 
@@ -103,14 +97,15 @@ const StorageForm = () => {
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Form Penyimpanan Makanan</h2>
-              <p className="text-sm text-gray-600">Masukkan informasi makanan yang akan disimpan</p>
+              <h2 className="text-xl font-semibold text-gray-900">Form Edit Makanan</h2>
+              <p className="text-sm text-gray-600">Ubah informasi makanan yang disimpan</p>
             </div>
           </div>
         </div>
 
         <div className="px-6 py-6">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Food Name */}
             <div className="space-y-2">
               <label htmlFor="foodName" className="block text-sm font-medium text-gray-700">
                 Nama Makanan <span className="text-red-500">*</span>
@@ -118,14 +113,14 @@ const StorageForm = () => {
               <input
                 id="foodName"
                 type="text"
-                placeholder="Masukkan nama makanan"
                 value={formData.foodName}
                 onChange={(e) => handleInputChange("foodName", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
 
+            {/* Category */}
             <div className="space-y-2">
               <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                 Kategori <span className="text-red-500">*</span>
@@ -135,17 +130,18 @@ const StorageForm = () => {
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
               >
-                <option value="">Pilih kategori makanan</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
+                <option value="">Pilih kategori</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* Quantity and Unit */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
@@ -154,13 +150,10 @@ const StorageForm = () => {
                 <input
                   id="quantity"
                   type="number"
-                  placeholder="0"
-                  min="0"
-                  step="0.1"
                   value={formData.quantity}
                   onChange={(e) => handleInputChange("quantity", e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
                 />
               </div>
               <div className="space-y-2">
@@ -172,7 +165,7 @@ const StorageForm = () => {
                   value={formData.unit}
                   onChange={(e) => handleInputChange("unit", e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
                 >
                   <option value="">Pilih satuan</option>
                   {units.map((unit) => (
@@ -184,6 +177,7 @@ const StorageForm = () => {
               </div>
             </div>
 
+            {/* Location */}
             <div className="space-y-2">
               <label htmlFor="location" className="block text-sm font-medium text-gray-700">
                 Lokasi Penyimpanan <span className="text-red-500">*</span>
@@ -191,14 +185,14 @@ const StorageForm = () => {
               <input
                 id="location"
                 type="text"
-                placeholder="Contoh: Kulkas, Freezer, Pantry, dll"
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
 
+            {/* Expired Date */}
             <div className="space-y-2">
               <label htmlFor="expiredDate" className="block text-sm font-medium text-gray-700">
                 Tanggal Kedaluwarsa
@@ -209,21 +203,22 @@ const StorageForm = () => {
                 min={today}
                 value={formData.expiredDate}
                 onChange={(e) => handleInputChange("expiredDate", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
               />
             </div>
 
+            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
               >
-                Simpan Data
+                Update Data
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md border border-gray-300 transition-colors"
+                className="flex-1 bg-white text-gray-700 border border-gray-300 py-2 px-4 rounded-md"
               >
                 Reset Form
               </button>
@@ -235,4 +230,4 @@ const StorageForm = () => {
   )
 }
 
-export default StorageForm
+export default UpdateForm
