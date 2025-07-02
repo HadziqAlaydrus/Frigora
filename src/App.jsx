@@ -7,15 +7,16 @@ import Home from './pages/Home'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import FormStorage from './pages/FormStorage'
-import Storage from './pages/Storage'
+import Storage from './pages/StoragePage'
 import UpdatePage from './pages/UpdatePage'
 import Report from './pages/Report'
 import ProtectedRoute from './components/ProtectedRoute' // ⬅️ Tambahkan ini
 
 function Layout({children}) {
+  const [searchResult, setSearchResult] = useState([]);
   return (
     <>
-      <NavigationBar/>
+      <NavigationBar onSearchResult={setSearchResult}/>
       {children}
       <Footer/>
     </>

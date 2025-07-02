@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const StorageCard = ({ searchResults = [], selectedCategory = null }) => {
+const StorageCard = ({ selectedCategory = null }) => {
   const [items, setItems] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [isSearch, setIsSearch] = useState(false);
   const navigate = useNavigate();
 
+  // Ambil user ID dari token
   useEffect(() => {
     const getUserIdFromToken = () => {
       const token = localStorage.getItem("token");
@@ -29,21 +31,38 @@ const StorageCard = ({ searchResults = [], selectedCategory = null }) => {
     setUserId(uid);
   }, []);
 
+  // Ambil data dari localStorage atau dari API
   useEffect(() => {
-    const fetchItems = async () => {
-      if (!userId) return;
+    if (!userId) return;
 
-      try {
-        const res = await axios.get(`http://localhost:5000/api/food/user/${userId}`);
-        setItems(res.data);
-      } catch (error) {
-        console.error("Failed fetching food items:", error);
-      }
-    };
+    const storedResults = localStorage.getItem("search_results");
+    if (storedResults) {
+      setItems(JSON.parse(storedResults));
+      setIsSearch(true);
 
-    fetchItems();
+      // Clear setelah digunakan agar tidak stay terus
+      localStorage.removeItem("search_results");
+      localStorage.removeItem("search_term");
+    } else {
+      const fetchItems = async () => {
+        try {
+          const res = await axios.get(`http://localhost:5000/api/food/user/${userId}`);
+          setItems(res.data);
+          setIsSearch(false);
+        } catch (error) {
+          console.error("Failed fetching food items:", error);
+        }
+      };
+      fetchItems();
+    }
   }, [userId]);
 
+  // Filter berdasarkan kategori (jika dipilih)
+  const displayItems = items.filter(
+    (item) => !selectedCategory || item.category === selectedCategory
+  );
+
+  // Handle hapus data
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm("Apakah kamu yakin ingin menghapus item ini?");
     if (!isConfirmed) return;
@@ -57,14 +76,12 @@ const StorageCard = ({ searchResults = [], selectedCategory = null }) => {
     }
   };
 
+  // Handle edit data
   const handleEdit = (id) => {
     navigate(`/update/${id}`);
   };
 
-  const displayItems = (searchResults.length > 0 ? searchResults : items).filter(
-    (item) => !selectedCategory || item.category === selectedCategory
-  );
-
+  // Tampilan jika belum login
   if (!userId) {
     return (
       <div className="text-center text-gray-500 py-10">
@@ -118,7 +135,9 @@ const StorageCard = ({ searchResults = [], selectedCategory = null }) => {
         ))
       ) : (
         <div className="col-span-full text-center py-10 text-gray-500 dark:text-gray-400">
-          No items found. Add some food to your storage!
+          {isSearch
+            ? "Tidak ditemukan hasil untuk pencarian tersebut."
+            : "Belum ada makanan yang disimpan. Tambahkan sekarang!"}
         </div>
       )}
     </section>

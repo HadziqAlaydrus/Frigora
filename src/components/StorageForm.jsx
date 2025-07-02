@@ -26,8 +26,8 @@ const StorageForm = () => {
     location: "",
     expiredDate: "",
   })
-
   const [userId, setUserId] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     const id = getUserIdFromToken()
@@ -38,9 +38,7 @@ const StorageForm = () => {
     }
   }, [])
 
-  const categories = [
-    "Protein","Vegetables","Fruits","Fast Food","Frozen Food"
-  ]
+  const categories = ["Protein", "Vegetables", "Fruits", "Fast Food", "Frozen Food"]
 
   const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "botol", "kaleng", "sachet", "bungkus"]
 
@@ -59,6 +57,8 @@ const StorageForm = () => {
       return
     }
 
+    setIsSubmitting(true)
+
     try {
       const response = await axios.post("http://localhost:5000/api/food", {
         users_id: userId,
@@ -76,6 +76,8 @@ const StorageForm = () => {
     } catch (error) {
       console.error("Gagal menyimpan data:", error)
       alert("Gagal menyimpan data. Silakan cek kembali.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -94,25 +96,33 @@ const StorageForm = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 px-6 py-6 text-white">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
               </svg>
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Form Penyimpanan Makanan</h2>
-              <p className="text-sm text-gray-600">Masukkan informasi makanan yang akan disimpan</p>
+              <h2 className="text-2xl font-bold">Form Penyimpanan Makanan</h2>
+              <p className="text-blue-100 opacity-90">Masukkan informasi makanan yang akan disimpan</p>
             </div>
           </div>
         </div>
 
-        <div className="px-6 py-6">
+        {/* Form Content */}
+        <div className="px-6 py-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nama Makanan */}
             <div className="space-y-2">
-              <label htmlFor="foodName" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="foodName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Nama Makanan <span className="text-red-500">*</span>
               </label>
               <input
@@ -122,12 +132,13 @@ const StorageForm = () => {
                 value={formData.foodName}
                 onChange={(e) => handleInputChange("foodName", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               />
             </div>
 
+            {/* Kategori */}
             <div className="space-y-2">
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Kategori <span className="text-red-500">*</span>
               </label>
               <select
@@ -135,7 +146,7 @@ const StorageForm = () => {
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               >
                 <option value="">Pilih kategori makanan</option>
                 {categories.map((category) => (
@@ -146,9 +157,10 @@ const StorageForm = () => {
               </select>
             </div>
 
+            {/* Jumlah & Satuan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="quantity" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Jumlah <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -160,11 +172,12 @@ const StorageForm = () => {
                   value={formData.quantity}
                   onChange={(e) => handleInputChange("quantity", e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                 />
               </div>
+
               <div className="space-y-2">
-                <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="unit" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Satuan <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -172,7 +185,7 @@ const StorageForm = () => {
                   value={formData.unit}
                   onChange={(e) => handleInputChange("unit", e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                 >
                   <option value="">Pilih satuan</option>
                   {units.map((unit) => (
@@ -184,8 +197,9 @@ const StorageForm = () => {
               </div>
             </div>
 
+            {/* Lokasi Penyimpanan */}
             <div className="space-y-2">
-              <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="location" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Lokasi Penyimpanan <span className="text-red-500">*</span>
               </label>
               <input
@@ -195,13 +209,15 @@ const StorageForm = () => {
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               />
             </div>
 
+            {/* Tanggal Kedaluwarsa */}
             <div className="space-y-2">
-              <label htmlFor="expiredDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="expiredDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Tanggal Kedaluwarsa
+                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">(Opsional)</span>
               </label>
               <input
                 id="expiredDate"
@@ -209,23 +225,47 @@ const StorageForm = () => {
                 min={today}
                 value={formData.expiredDate}
                 onChange={(e) => handleInputChange("expiredDate", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                disabled={isSubmitting}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
               >
-                Simpan Data
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <span>Menyimpan...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Simpan Data</span>
+                  </>
+                )}
               </button>
+
               <button
                 type="button"
                 onClick={handleReset}
-                className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-md border border-gray-300 transition-colors"
+                disabled={isSubmitting}
+                className="flex-1 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-xl border border-gray-300 dark:border-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-sm hover:shadow-md"
               >
-                Reset Form
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span>Reset Form</span>
               </button>
             </div>
           </form>

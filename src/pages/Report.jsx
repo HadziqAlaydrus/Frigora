@@ -1,10 +1,11 @@
 import React from 'react'
+import ReportCard from '../components/ReportCard'
 
 const Report = () => {
   return (
-    <div>
-      
-    </div>
+    <section className='min-h-screen'>
+      <ReportCard/>
+    </section>
   )
 }
 
