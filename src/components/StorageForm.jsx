@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import axios from "axios"
 
 // Ambil userId dari token
@@ -18,6 +19,7 @@ const getUserIdFromToken = () => {
 }
 
 const StorageForm = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     foodName: "",
     category: "",
@@ -28,19 +30,24 @@ const StorageForm = () => {
   })
   const [userId, setUserId] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     const id = getUserIdFromToken()
     if (id) {
       setUserId(id)
     } else {
-      alert("User belum login.")
+      showNotification("error", "User belum login", "Silakan login terlebih dahulu untuk menggunakan fitur ini.")
     }
   }, [])
 
   const categories = ["Protein", "Vegetables", "Fruits", "Fast Food", "Frozen Food"]
-
   const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "botol", "kaleng", "sachet", "bungkus"]
+
+  const showNotification = (type, title, message) => {
+    setNotification({ type, title, message })
+    setTimeout(() => setNotification(null), 5000) // Auto hide after 5 seconds
+  }
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -53,7 +60,7 @@ const StorageForm = () => {
     e.preventDefault()
 
     if (!userId) {
-      alert("User ID tidak ditemukan. Pastikan sudah login.")
+      showNotification("error", "Login Required", "User ID tidak ditemukan. Pastikan sudah login.")
       return
     }
 
@@ -71,11 +78,16 @@ const StorageForm = () => {
       })
 
       console.log("Data berhasil disimpan:", response.data)
-      alert("Data berhasil disimpan!")
+      showNotification("success", "Berhasil!", "Data makanan berhasil disimpan ke storage.")
       handleReset()
+
+      // Delay navigation to show notification
+      setTimeout(() => {
+        navigate("/storage")
+      }, 2000)
     } catch (error) {
       console.error("Gagal menyimpan data:", error)
-      alert("Gagal menyimpan data. Silakan cek kembali.")
+      showNotification("error", "Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.")
     } finally {
       setIsSubmitting(false)
     }
@@ -92,10 +104,95 @@ const StorageForm = () => {
     })
   }
 
+  const closeNotification = () => {
+    setNotification(null)
+  }
+
   const today = new Date().toISOString().split("T")[0]
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
+    <div className="w-full max-w-2xl mx-auto p-4 relative">
+      {/* Notification Popup */}
+      {notification && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
+          <div
+            className={`max-w-sm w-full bg-white dark:bg-gray-800 shadow-lg rounded-xl border-l-4 ${
+              notification.type === "success"
+                ? "border-green-500"
+                : notification.type === "error"
+                  ? "border-red-500"
+                  : "border-blue-500"
+            } p-4`}
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                {notification.type === "success" ? (
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-green-600 dark:text-green-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                ) : notification.type === "error" ? (
+                  <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-red-600 dark:text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="ml-3 flex-1">
+                <h3
+                  className={`text-sm font-semibold ${
+                    notification.type === "success"
+                      ? "text-green-800 dark:text-green-200"
+                      : notification.type === "error"
+                        ? "text-red-800 dark:text-red-200"
+                        : "text-blue-800 dark:text-blue-200"
+                  }`}
+                >
+                  {notification.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{notification.message}</p>
+              </div>
+              <button
+                onClick={closeNotification}
+                className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 px-6 py-6 text-white">

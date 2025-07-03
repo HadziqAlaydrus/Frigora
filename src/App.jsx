@@ -10,7 +10,7 @@ import FormStorage from './pages/FormStorage'
 import Storage from './pages/StoragePage'
 import UpdatePage from './pages/UpdatePage'
 import Report from './pages/Report'
-import ProtectedRoute from './components/ProtectedRoute' // ⬅️ Tambahkan ini
+import ProtectedRoute from './components/ProtectedRoute'
 
 function Layout({children}) {
   const [searchResult, setSearchResult] = useState([]);

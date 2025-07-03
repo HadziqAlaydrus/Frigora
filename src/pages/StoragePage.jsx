@@ -4,6 +4,7 @@ import StorageCard from "../components/StorageCard";
 import CreateButton from "../components/CreateButton";
 import Chabot from "../components/Chabot";
 
+
 const StoragePage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -21,7 +22,6 @@ const StoragePage = () => {
           selectedCategory={selectedCategory}
         />
       </div>
-
       <StorageCard selectedCategory={selectedCategory} />
       <Chabot />
     </div>
