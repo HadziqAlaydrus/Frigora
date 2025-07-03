@@ -69,7 +69,7 @@ const UpdateForm = () => {
     setIsSubmitting(true)
 
     try {
-      await axios.put(`http://localhost:5000/api/food/${id}`, {
+      await axios.put(`https://backend-frigora.vercel.app/api/food/${id}`, {
         name: formData.foodName,
         category: formData.category,
         quantity: formData.quantity,

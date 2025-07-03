@@ -48,7 +48,7 @@ const Chatbot = () => {
             "Silakan login terlebih dahulu untuk mendapatkan resep dari bahan.";
         } else {
           const res = await fetch(
-            `http://localhost:5000/api/gemini/recipe/${userId}`
+            `https://backend-frigora.vercel.app/api/gemini/recipe/${userId}`
           );
           const data = await res.json();
           botReply =
@@ -57,7 +57,7 @@ const Chatbot = () => {
         }
       } else {
         // pakai input teks
-        const res = await fetch("http://localhost:5000/api/gemini/text", {
+        const res = await fetch("https://backend-frigora.vercel.app/api/gemini/text", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),

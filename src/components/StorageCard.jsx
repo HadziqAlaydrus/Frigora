@@ -204,7 +204,7 @@ const StorageCard = ({ selectedCategory = null }) => {
     } else {
       const fetchItems = async () => {
         try {
-          const res = await axios.get(`http://localhost:5000/api/food/user/${userId}`)
+          const res = await axios.get(`https://backend-frigora.vercel.app/api/food/user/${userId}`)
           setItems(res.data)
           setIsSearch(false)
 
@@ -232,7 +232,7 @@ const StorageCard = ({ selectedCategory = null }) => {
     if (!isConfirmed) return
 
     try {
-      await axios.delete(`http://localhost:5000/api/food/${id}`)
+      await axios.delete(`https://backend-frigora.vercel.app/api/food/${id}`)
       setItems((prev) => prev.filter((item) => item.id !== id))
       toast.success("Item berhasil dihapus!", {
         position: "top-right",

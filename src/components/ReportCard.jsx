@@ -37,7 +37,7 @@ const ReportCard = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const res = await axios.get(`http://localhost:5000/api/report/${userId}`)
+        const res = await axios.get(`https://backend-frigora.vercel.app/api/report/${userId}`)
         setData(res.data.data)
         setFilteredData([]) // Kosongkan sampai user filter
       } catch (err) {

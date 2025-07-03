@@ -67,7 +67,7 @@ const StorageForm = () => {
     setIsSubmitting(true)
 
     try {
-      const response = await axios.post("http://localhost:5000/api/food", {
+      const response = await axios.post("https://backend-frigora.vercel.app/api/food", {
         users_id: userId,
         name: formData.foodName,
         category: formData.category,
