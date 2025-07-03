@@ -11,26 +11,24 @@ const Category = ({ onCategorySelect, selectedCategory }) => {
 
   return (
     <div className="w-full py-3">
-      <div className="flex gap-2 overflow-x-auto pb-2 px-2">
+      <div className="flex gap-3 overflow-x-auto pb-2 px-3 scrollbar-hide scroll-smooth">
         {categories.map((category, index) => {
           const isActive = category.name === selectedCategory;
           return (
             <div
               key={index}
               onClick={() => onCategorySelect(category.name)}
-              className={`flex-shrink-0 min-w-[80px] p-2 rounded-md shadow-sm cursor-pointer group border
-                ${
-                  isActive
-                    ? "bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-800 dark:border-blue-400"
-                    : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                }
-              `}
+              className={`flex-shrink-0 w-24 sm:w-28 md:w-32 p-3 rounded-lg shadow-sm cursor-pointer group border transition-all duration-200 ${
+                isActive
+                  ? "bg-blue-100 border-blue-500 text-blue-700 dark:bg-blue-800 dark:border-blue-400"
+                  : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+              }`}
             >
-              <div className="text-center">
-                <div className="text-xl mb-1 group-hover:scale-105 transition-transform">
+              <div className="text-center space-y-1">
+                <div className="text-2xl group-hover:scale-110 transition-transform">
                   {category.icon}
                 </div>
-                <p className="text-xs font-medium">
+                <p className="text-xs sm:text-sm font-medium truncate">
                   {category.name}
                 </p>
               </div>

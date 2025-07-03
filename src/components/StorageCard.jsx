@@ -1,74 +1,76 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import dayjs from "dayjs"
-import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
-import "../alert-toast.css"
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../alert-toast.css";
 
 const StorageCard = ({ selectedCategory = null }) => {
-  const [items, setItems] = useState([])
-  const [userId, setUserId] = useState(null)
-  const [isSearch, setIsSearch] = useState(false)
-  const [hasShownNotification, setHasShownNotification] = useState(false)
-  const navigate = useNavigate()
+  const [items, setItems] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [isSearch, setIsSearch] = useState(false);
+  const [hasShownNotification, setHasShownNotification] = useState(false);
+  const navigate = useNavigate();
 
   // Ambil user ID dari token
   useEffect(() => {
     const getUserIdFromToken = () => {
-      const token = localStorage.getItem("token")
-      if (!token) return null
+      const token = localStorage.getItem("token");
+      if (!token) return null;
 
       try {
-        const payload = JSON.parse(atob(token.split(".")[1]))
-        return payload.id
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        return payload.id;
       } catch (error) {
-        console.error("Failed to decode token:", error)
-        return null
+        console.error("Failed to decode token:", error);
+        return null;
       }
-    }
+    };
 
-    const uid = getUserIdFromToken()
+    const uid = getUserIdFromToken();
     if (!uid) {
-      console.warn("User not logged in or token not found.")
+      console.warn("User not logged in or token not found.");
     }
-    setUserId(uid)
-  }, [])
+    setUserId(uid);
+  }, []);
 
   // Function to check expiry status and show notifications
   const checkExpiryAndNotify = (items) => {
-    if (hasShownNotification || items.length === 0) return
+    if (hasShownNotification || items.length === 0) return;
 
-    const today = dayjs()
-    const inSevenDays = today.add(7, "day")
-    const almost = []
-    const expired = []
+    const today = dayjs();
+    const inSevenDays = today.add(7, "day");
+    const almost = [];
+    const expired = [];
 
     items.forEach((item) => {
-      if (!item.expired_date) return
+      if (!item.expired_date) return;
 
-      const expDate = dayjs(item.expired_date)
+      const expDate = dayjs(item.expired_date);
 
       if (expDate.isBefore(today, "day")) {
-        expired.push(item.name)
+        expired.push(item.name);
       } else if (expDate.isBefore(inSevenDays, "day")) {
-        almost.push(item.name)
+        almost.push(item.name);
       }
-    })
+    });
 
     // Show notifications
     if (expired.length > 0) {
       toast.error(
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">
-            
-          </div>
+          <div className="flex-shrink-0 mt-0.5"></div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-red-200 dark:text-red-200 mb-1"> Makanan Kadaluarsa</div>
+            <div className="text-sm font-semibold text-red-200 dark:text-red-200 mb-1">
+              {" "}
+              Makanan Kadaluarsa
+            </div>
             <div className="text-sm text-red-200 dark:text-red-200">
-              <span className="font-medium">{expired.length} makanan</span> sudah kadaluarsa:
+              <span className="font-medium">{expired.length} makanan</span>{" "}
+              sudah kadaluarsa:
             </div>
             <div className="text-xs text-red-200 dark:text-red-200 mt-1 font-medium">
               {expired.slice(0, 3).join(", ")}
@@ -83,22 +85,21 @@ const StorageCard = ({ selectedCategory = null }) => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-        },
-      )
+        }
+      );
     }
 
     if (almost.length > 0) {
       toast.warn(
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">
-            
-          </div>
+          <div className="flex-shrink-0 mt-0.5"></div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-yellow-200 dark:text-yellow-200 mb-1">
-               Peringatan Kadaluarsa
+              Peringatan Kadaluarsa
             </div>
             <div className="text-sm text-yellow-200 dark:text-yellow-200">
-              <span className="font-medium">{almost.length} makanan</span> hampir kadaluarsa:
+              <span className="font-medium">{almost.length} makanan</span>{" "}
+              hampir kadaluarsa:
             </div>
             <div className="text-xs text-yellow-200 dark:text-yellow-200 mt-1 font-medium">
               {almost.slice(0, 3).join(", ")}
@@ -113,28 +114,18 @@ const StorageCard = ({ selectedCategory = null }) => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-        },
-      )
+        }
+      );
     }
 
     if (almost.length === 0 && expired.length === 0 && items.length > 0) {
       toast.success(
         <div className="flex items-start space-x-3">
-          <div className="flex-shrink-0 mt-0.5">
-            <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-green-600 dark:text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-green-800 dark:text-green-200 mb-1">✅ Semua Makanan Aman</div>
-            <div className="text-sm text-green-700 dark:text-green-300">
+            <div className="text-sm font-semibold text-green-200 dark:text-green-200 mb-1">
+              Semua Makanan Aman
+            </div>
+            <div className="text-sm text-green-200 dark:text-green-200">
               Tidak ada makanan yang kadaluarsa atau hampir kadaluarsa
             </div>
           </div>
@@ -146,21 +137,25 @@ const StorageCard = ({ selectedCategory = null }) => {
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
-        },
-      )
+        }
+      );
     }
 
-    setHasShownNotification(true)
-  }
+    setHasShownNotification(true);
+  };
 
   // Function to get expiry status for individual items
   const getExpiryStatus = (expiredDateStr) => {
     if (!expiredDateStr)
-      return { text: "Tidak ada", color: "text-gray-500 dark:text-gray-400", bgColor: "bg-gray-100 dark:bg-gray-700" }
+      return {
+        text: "Tidak ada",
+        color: "text-gray-500 dark:text-gray-400",
+        bgColor: "bg-gray-100 dark:bg-gray-700",
+      };
 
-    const expiredDate = new Date(expiredDateStr)
-    const today = new Date()
-    const daysLeft = Math.ceil((expiredDate - today) / (1000 * 60 * 60 * 24))
+    const expiredDate = new Date(expiredDateStr);
+    const today = new Date();
+    const daysLeft = Math.ceil((expiredDate - today) / (1000 * 60 * 60 * 24));
 
     if (expiredDate < today) {
       return {
@@ -168,7 +163,7 @@ const StorageCard = ({ selectedCategory = null }) => {
         color: "text-red-600 dark:text-red-400",
         bgColor: "bg-red-50 dark:bg-red-900/20",
         icon: "🗑️",
-      }
+      };
     }
     if (daysLeft <= 7) {
       return {
@@ -176,81 +171,87 @@ const StorageCard = ({ selectedCategory = null }) => {
         color: "text-yellow-600 dark:text-yellow-400",
         bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
         icon: "⚠️",
-      }
+      };
     }
     return {
       text: "Aman",
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/20",
       icon: "✅",
-    }
-  }
+    };
+  };
 
   // Ambil data dari localStorage atau dari API
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
 
-    const storedResults = localStorage.getItem("search_results")
+    const storedResults = localStorage.getItem("search_results");
     if (storedResults) {
-      const searchResults = JSON.parse(storedResults)
-      setItems(searchResults)
-      setIsSearch(true)
+      const searchResults = JSON.parse(storedResults);
+      setItems(searchResults);
+      setIsSearch(true);
       // Clear setelah digunakan agar tidak stay terus
-      localStorage.removeItem("search_results")
-      localStorage.removeItem("search_term")
+      localStorage.removeItem("search_results");
+      localStorage.removeItem("search_term");
 
       // Check expiry for search results
-      setTimeout(() => checkExpiryAndNotify(searchResults), 1000)
+      setTimeout(() => checkExpiryAndNotify(searchResults), 1000);
     } else {
       const fetchItems = async () => {
         try {
-          const res = await axios.get(`https://backend-frigora.vercel.app/api/food/user/${userId}`)
-          setItems(res.data)
-          setIsSearch(false)
+          const res = await axios.get(
+            `https://backend-frigora.vercel.app/api/food/user/${userId}`
+          );
+          setItems(res.data);
+          setIsSearch(false);
 
           // Check expiry for fetched items
-          setTimeout(() => checkExpiryAndNotify(res.data), 1000)
+          setTimeout(() => checkExpiryAndNotify(res.data), 1000);
         } catch (error) {
-          console.error("Failed fetching food items:", error)
+          console.error("Failed fetching food items:", error);
           toast.error("Gagal memuat data makanan", {
             position: "top-right",
             autoClose: 5000,
-          })
+          });
         }
-      }
+      };
 
-      fetchItems()
+      fetchItems();
     }
-  }, [userId])
+  }, [userId]);
 
   // Filter berdasarkan kategori (jika dipilih)
-  const displayItems = items.filter((item) => !selectedCategory || item.category === selectedCategory)
+  const displayItems = items.filter(
+    (item) => !selectedCategory || item.category === selectedCategory
+  );
 
   // Handle hapus data
   const handleDelete = async (id) => {
-    const isConfirmed = window.confirm("Apakah kamu yakin ingin menghapus item ini?")
-    if (!isConfirmed) return
+    const isConfirmed = window.confirm(
+      "Apakah kamu yakin ingin menghapus item ini?"
+    );
+    if (!isConfirmed) return;
 
     try {
-      await axios.delete(`https://backend-frigora.vercel.app/api/food/${id}`)
-      setItems((prev) => prev.filter((item) => item.id !== id))
+      await axios.delete(`https://backend-frigora.vercel.app/api/food/${id}`);
+      setItems((prev) => prev.filter((item) => item.id !== id));
       toast.success("Item berhasil dihapus!", {
         position: "top-right",
         autoClose: 3000,
-      })
+      });
     } catch (error) {
-      console.error("Failed to delete item:", error)
+      console.error("Failed to delete item:", error);
       toast.error("Gagal menghapus item. Silakan coba lagi.", {
         position: "top-right",
         autoClose: 5000,
-      })
+      });
     }
-  }
+  };
 
   // Handle edit data
   const handleEdit = (id) => {
-    navigate(`/update/${id}`)
-  }
+    navigate(`/update/${id}`);
+  };
 
   // Tampilan jika belum login
   if (!userId) {
@@ -258,7 +259,7 @@ const StorageCard = ({ selectedCategory = null }) => {
       <div className="text-center text-gray-500 py-10">
         Silakan login terlebih dahulu untuk melihat data penyimpanan.
       </div>
-    )
+    );
   }
 
   return (
@@ -282,14 +283,16 @@ const StorageCard = ({ selectedCategory = null }) => {
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
         {displayItems.length > 0 ? (
           displayItems.map((item) => {
-            const expiryStatus = getExpiryStatus(item.expired_date)
+            const expiryStatus = getExpiryStatus(item.expired_date);
             return (
               <div
                 key={item.id}
                 className="card bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/30 p-4 border border-gray-100 dark:border-gray-700 transition-all duration-200 hover:shadow-lg dark:hover:shadow-gray-900/40 hover:scale-[1.02]"
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white">{item.name}</h2>
+                  <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
+                    {item.name}
+                  </h2>
                   <div
                     className={`px-2 py-1 rounded-full text-xs font-medium ${expiryStatus.bgColor} ${expiryStatus.color} flex items-center space-x-1`}
                   >
@@ -300,7 +303,9 @@ const StorageCard = ({ selectedCategory = null }) => {
 
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-600 dark:text-gray-400">Kategori:</span>
+                    <span className="font-medium text-gray-600 dark:text-gray-400">
+                      Kategori:
+                    </span>
                     <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md text-xs font-medium">
                       {item.category}
                     </span>
@@ -320,10 +325,14 @@ const StorageCard = ({ selectedCategory = null }) => {
 
                   <div className="flex justify-between text-gray-600 dark:text-gray-300">
                     <span className="font-medium">Kadaluarsa:</span>
-                    <span>{item.expired_date ? new Date(item.expired_date).toLocaleDateString("id-ID") : "-"}</span>
+                    <span>
+                      {item.expired_date
+                        ? new Date(item.expired_date).toLocaleDateString(
+                            "id-ID"
+                          )
+                        : "-"}
+                    </span>
                   </div>
-
-                  
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end space-x-2">
@@ -331,7 +340,12 @@ const StorageCard = ({ selectedCategory = null }) => {
                     onClick={() => handleEdit(item.id)}
                     className="px-3 py-2 text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-200 font-medium flex items-center space-x-1"
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -345,7 +359,12 @@ const StorageCard = ({ selectedCategory = null }) => {
                     onClick={() => handleDelete(item.id)}
                     className="px-3 py-2 text-xs bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-all duration-200 font-medium flex items-center space-x-1"
                   >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-3 h-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -357,7 +376,7 @@ const StorageCard = ({ selectedCategory = null }) => {
                   </button>
                 </div>
               </div>
-            )
+            );
           })
         ) : (
           <div className="col-span-full text-center py-12">
@@ -375,10 +394,8 @@ const StorageCard = ({ selectedCategory = null }) => {
           </div>
         )}
       </section>
-
-      
     </>
-  )
-}
+  );
+};
 
-export default StorageCard
+export default StorageCard;
