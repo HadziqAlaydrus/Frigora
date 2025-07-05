@@ -122,7 +122,7 @@ const NavigationBar = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  placeholder="Cari makanan..."
+                  placeholder="Search Food..."
                   className="w-64 pl-10 pr-20 py-2.5 border rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                 />
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

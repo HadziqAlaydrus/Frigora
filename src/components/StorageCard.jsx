@@ -15,7 +15,6 @@ const StorageCard = ({ selectedCategory = null }) => {
   const [hasShownNotification, setHasShownNotification] = useState(false);
   const navigate = useNavigate();
 
-  // Ambil user ID dari token
   useEffect(() => {
     const getUserIdFromToken = () => {
       const token = localStorage.getItem("token");
@@ -37,7 +36,6 @@ const StorageCard = ({ selectedCategory = null }) => {
     setUserId(uid);
   }, []);
 
-  // Function to check expiry status and show notifications
   const checkExpiryAndNotify = (items) => {
     if (hasShownNotification || items.length === 0) return;
 
@@ -58,23 +56,20 @@ const StorageCard = ({ selectedCategory = null }) => {
       }
     });
 
-    // Show notifications
     if (expired.length > 0) {
       toast.error(
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0 mt-0.5"></div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-red-200 dark:text-red-200 mb-1">
-              {" "}
-              Makanan Kadaluarsa
+              Expired Items
             </div>
             <div className="text-sm text-red-200 dark:text-red-200">
-              <span className="font-medium">{expired.length} makanan</span>{" "}
-              sudah kadaluarsa:
+              <span className="font-medium">{expired.length} item(s)</span> have expired:
             </div>
             <div className="text-xs text-red-200 dark:text-red-200 mt-1 font-medium">
               {expired.slice(0, 3).join(", ")}
-              {expired.length > 3 && ` dan ${expired.length - 3} lainnya`}
+              {expired.length > 3 && ` and ${expired.length - 3} more`}
             </div>
           </div>
         </div>,
@@ -95,15 +90,14 @@ const StorageCard = ({ selectedCategory = null }) => {
           <div className="flex-shrink-0 mt-0.5"></div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-yellow-200 dark:text-yellow-200 mb-1">
-              Peringatan Kadaluarsa
+              Expiry Warning
             </div>
             <div className="text-sm text-yellow-200 dark:text-yellow-200">
-              <span className="font-medium">{almost.length} makanan</span>{" "}
-              hampir kadaluarsa:
+              <span className="font-medium">{almost.length} item(s)</span> are about to expire:
             </div>
             <div className="text-xs text-yellow-200 dark:text-yellow-200 mt-1 font-medium">
               {almost.slice(0, 3).join(", ")}
-              {almost.length > 3 && ` dan ${almost.length - 3} lainnya`}
+              {almost.length > 3 && ` and ${almost.length - 3} more`}
             </div>
           </div>
         </div>,
@@ -123,10 +117,10 @@ const StorageCard = ({ selectedCategory = null }) => {
         <div className="flex items-start space-x-3">
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold text-green-200 dark:text-green-200 mb-1">
-              Semua Makanan Aman
+              All Items Are Safe
             </div>
             <div className="text-sm text-green-200 dark:text-green-200">
-              Tidak ada makanan yang kadaluarsa atau hampir kadaluarsa
+              No items are expired or close to expiring.
             </div>
           </div>
         </div>,
@@ -144,11 +138,10 @@ const StorageCard = ({ selectedCategory = null }) => {
     setHasShownNotification(true);
   };
 
-  // Function to get expiry status for individual items
   const getExpiryStatus = (expiredDateStr) => {
     if (!expiredDateStr)
       return {
-        text: "Tidak ada",
+        text: "None",
         color: "text-gray-500 dark:text-gray-400",
         bgColor: "bg-gray-100 dark:bg-gray-700",
       };
@@ -159,7 +152,7 @@ const StorageCard = ({ selectedCategory = null }) => {
 
     if (expiredDate < today) {
       return {
-        text: "Kadaluarsa",
+        text: "Expired",
         color: "text-red-600 dark:text-red-400",
         bgColor: "bg-red-50 dark:bg-red-900/20",
         icon: "🗑️",
@@ -167,21 +160,20 @@ const StorageCard = ({ selectedCategory = null }) => {
     }
     if (daysLeft <= 7) {
       return {
-        text: `${daysLeft} hari lagi`,
+        text: `${daysLeft} day(s) left`,
         color: "text-yellow-600 dark:text-yellow-400",
         bgColor: "bg-yellow-50 dark:bg-yellow-900/20",
         icon: "⚠️",
       };
     }
     return {
-      text: "Aman",
+      text: "Safe",
       color: "text-green-600 dark:text-green-400",
       bgColor: "bg-green-50 dark:bg-green-900/20",
       icon: "✅",
     };
   };
 
-  // Ambil data dari localStorage atau dari API
   useEffect(() => {
     if (!userId) return;
 
@@ -190,11 +182,9 @@ const StorageCard = ({ selectedCategory = null }) => {
       const searchResults = JSON.parse(storedResults);
       setItems(searchResults);
       setIsSearch(true);
-      // Clear setelah digunakan agar tidak stay terus
       localStorage.removeItem("search_results");
       localStorage.removeItem("search_term");
 
-      // Check expiry for search results
       setTimeout(() => checkExpiryAndNotify(searchResults), 1000);
     } else {
       const fetchItems = async () => {
@@ -204,12 +194,10 @@ const StorageCard = ({ selectedCategory = null }) => {
           );
           setItems(res.data);
           setIsSearch(false);
-
-          // Check expiry for fetched items
           setTimeout(() => checkExpiryAndNotify(res.data), 1000);
         } catch (error) {
           console.error("Failed fetching food items:", error);
-          toast.error("Gagal memuat data makanan", {
+          toast.error("Failed to load food data", {
             position: "top-right",
             autoClose: 5000,
           });
@@ -220,44 +208,40 @@ const StorageCard = ({ selectedCategory = null }) => {
     }
   }, [userId]);
 
-  // Filter berdasarkan kategori (jika dipilih)
   const displayItems = items.filter(
     (item) => !selectedCategory || item.category === selectedCategory
   );
 
-  // Handle hapus data
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm(
-      "Apakah kamu yakin ingin menghapus item ini?"
+      "Are you sure you want to delete this item?"
     );
     if (!isConfirmed) return;
 
     try {
       await axios.delete(`https://backend-frigora.vercel.app/api/food/${id}`);
       setItems((prev) => prev.filter((item) => item.id !== id));
-      toast.success("Item berhasil dihapus!", {
+      toast.success("Item deleted successfully!", {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
       console.error("Failed to delete item:", error);
-      toast.error("Gagal menghapus item. Silakan coba lagi.", {
+      toast.error("Failed to delete item. Please try again.", {
         position: "top-right",
         autoClose: 5000,
       });
     }
   };
 
-  // Handle edit data
   const handleEdit = (id) => {
     navigate(`/update/${id}`);
   };
 
-  // Tampilan jika belum login
   if (!userId) {
     return (
       <div className="text-center text-gray-500 py-10">
-        Silakan login terlebih dahulu untuk melihat data penyimpanan.
+        Please log in first to view storage data.
       </div>
     );
   }
@@ -304,7 +288,7 @@ const StorageCard = ({ selectedCategory = null }) => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-600 dark:text-gray-400">
-                      Kategori:
+                      Category:
                     </span>
                     <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md text-xs font-medium">
                       {item.category}
@@ -312,24 +296,22 @@ const StorageCard = ({ selectedCategory = null }) => {
                   </div>
 
                   <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">Jumlah:</span>
+                    <span className="font-medium">Quantity:</span>
                     <span className="font-semibold">
                       {item.quantity} {item.unit}
                     </span>
                   </div>
 
                   <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">Lokasi:</span>
+                    <span className="font-medium">Location:</span>
                     <span>{item.location}</span>
                   </div>
 
                   <div className="flex justify-between text-gray-600 dark:text-gray-300">
-                    <span className="font-medium">Kadaluarsa:</span>
+                    <span className="font-medium">Expiration Date:</span>
                     <span>
                       {item.expired_date
-                        ? new Date(item.expired_date).toLocaleDateString(
-                            "id-ID"
-                          )
+                        ? new Date(item.expired_date).toLocaleDateString("en-GB")
                         : "-"}
                     </span>
                   </div>
@@ -372,7 +354,7 @@ const StorageCard = ({ selectedCategory = null }) => {
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                       />
                     </svg>
-                    <span>Hapus</span>
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
@@ -384,12 +366,12 @@ const StorageCard = ({ selectedCategory = null }) => {
               <div className="text-4xl">{isSearch ? "🔍" : "📦"}</div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {isSearch ? "Tidak Ada Hasil" : "Belum Ada Data"}
+              {isSearch ? "No Results Found" : "No Data Yet"}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               {isSearch
-                ? "Tidak ditemukan hasil untuk pencarian tersebut."
-                : "Belum ada makanan yang disimpan. Tambahkan sekarang!"}
+                ? "No matching items found for your search."
+                : "No stored food yet. Add something now!"}
             </p>
           </div>
         )}

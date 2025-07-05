@@ -28,7 +28,7 @@ const ReportCard = () => {
 
   const showNotification = (type, title, message) => {
     setNotification({ type, title, message })
-    setTimeout(() => setNotification(null), 5000) // Auto hide after 5 seconds
+    setTimeout(() => setNotification(null), 5000)
   }
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const ReportCard = () => {
         setIsLoading(true)
         const res = await axios.get(`https://backend-frigora.vercel.app/api/report/${userId}`)
         setData(res.data.data)
-        setFilteredData([]) // Kosongkan sampai user filter
+        setFilteredData([])
       } catch (err) {
         console.error("Failed to fetch report:", err)
       } finally {
@@ -53,13 +53,12 @@ const ReportCard = () => {
   const filterByDate = () => {
     const { from, to } = dateRange
     if (!from || !to) {
-      showNotification("error", "Filter Tidak Valid", "Harap isi rentang tanggal mulai dan akhir.")
+      showNotification("error", "Invalid Filter", "Please fill in both start and end date range.")
       return
     }
 
     const fromDate = new Date(from)
     const toDate = new Date(to)
-
     const filtered = data.filter((item) => {
       const itemDate = new Date(item.created_at)
       return itemDate >= fromDate && itemDate <= toDate
@@ -75,14 +74,14 @@ const ReportCard = () => {
     const today = new Date()
     const daysLeft = Math.ceil((expiredDate - today) / (1000 * 60 * 60 * 24))
 
-    if (expiredDate < today) return { text: "Sudah Kadaluarsa", color: "text-red-600 dark:text-red-400" }
-    if (daysLeft <= 7) return { text: "Hampir Kadaluarsa", color: "text-yellow-600 dark:text-yellow-400" }
-    return { text: "Baik", color: "text-green-600 dark:text-green-400" }
+    if (expiredDate < today) return { text: "Expired", color: "text-red-600 dark:text-red-400" }
+    if (daysLeft <= 7) return { text: "Near Expiry", color: "text-yellow-600 dark:text-yellow-400" }
+    return { text: "Good", color: "text-green-600 dark:text-green-400" }
   }
 
   const exportToPDF = async () => {
     if (filteredData.length === 0) {
-      showNotification("error", "Tidak Ada Data", "Tidak ada data untuk diekspor. Silakan filter data terlebih dahulu.")
+      showNotification("error", "No Data", "No data to export. Please filter data first.")
       return
     }
 
@@ -104,7 +103,7 @@ const ReportCard = () => {
       doc.setTextColor(255, 255, 255)
       doc.setFontSize(20)
       doc.setFont("helvetica", "bold")
-      doc.text("LAPORAN PENYIMPANAN MAKANAN", 105, 15, { align: "center" })
+      doc.text("FOOD STORAGE REPORT", 105, 15, { align: "center" })
 
       // Subtitle
       doc.setFontSize(12)
@@ -115,8 +114,7 @@ const ReportCard = () => {
       doc.setTextColor(...textColor)
       doc.setFontSize(10)
       doc.setFont("helvetica", "normal")
-
-      const currentDate = new Date().toLocaleDateString("id-ID", {
+      const currentDate = new Date().toLocaleDateString("en-US", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -124,19 +122,19 @@ const ReportCard = () => {
         minute: "2-digit",
       })
 
-      doc.text(`Tanggal Cetak: ${currentDate}`, 14, 45)
+      doc.text(`Print Date: ${currentDate}`, 14, 45)
       doc.text(
-        `Periode: ${new Date(dateRange.from).toLocaleDateString("id-ID")} - ${new Date(dateRange.to).toLocaleDateString("id-ID")}`,
+        `Period: ${new Date(dateRange.from).toLocaleDateString("en-US")} - ${new Date(dateRange.to).toLocaleDateString("en-US")}`,
         14,
         52,
       )
-      doc.text(`Total Data: ${filteredData.length} item`, 14, 59)
+      doc.text(`Total Data: ${filteredData.length} items`, 14, 59)
 
       // Summary Statistics
       const totalItems = filteredData.length
-      const goodItems = filteredData.filter((item) => getStatus(item.expired_date).text === "Baik").length
-      const nearExpiry = filteredData.filter((item) => getStatus(item.expired_date).text === "Hampir Kadaluarsa").length
-      const expired = filteredData.filter((item) => getStatus(item.expired_date).text === "Sudah Kadaluarsa").length
+      const goodItems = filteredData.filter((item) => getStatus(item.expired_date).text === "Good").length
+      const nearExpiry = filteredData.filter((item) => getStatus(item.expired_date).text === "Near Expiry").length
+      const expired = filteredData.filter((item) => getStatus(item.expired_date).text === "Expired").length
 
       // Summary Box
       doc.setFillColor(...lightGray)
@@ -147,13 +145,13 @@ const ReportCard = () => {
       doc.setFontSize(11)
       doc.setFont("helvetica", "bold")
       doc.setTextColor(...textColor)
-      doc.text("RINGKASAN DATA", 20, 80)
+      doc.text("DATA SUMMARY", 20, 80)
 
       doc.setFont("helvetica", "normal")
       doc.setFontSize(9)
-      doc.text(`• Kondisi Baik: ${goodItems} item`, 20, 87)
-      doc.text(`• Hampir Kadaluarsa: ${nearExpiry} item`, 70, 87)
-      doc.text(`• Sudah Kadaluarsa: ${expired} item`, 130, 87)
+      doc.text(`• Good Condition: ${goodItems} items`, 20, 87)
+      doc.text(`• Near Expiry: ${nearExpiry} items`, 70, 87)
+      doc.text(`• Expired: ${expired} items`, 130, 87)
 
       // Table
       const tableData = filteredData.map((item, index) => [
@@ -162,14 +160,14 @@ const ReportCard = () => {
         item.category,
         `${item.quantity} ${item.unit}`,
         item.location,
-        item.expired_date ? new Date(item.expired_date).toLocaleDateString("id-ID") : "-",
-        new Date(item.created_at).toLocaleDateString("id-ID"),
+        item.expired_date ? new Date(item.expired_date).toLocaleDateString("en-US") : "-",
+        new Date(item.created_at).toLocaleDateString("en-US"),
         getStatus(item.expired_date).text,
       ])
 
       autoTable(doc, {
         startY: 105,
-        head: [["No", "Nama Makanan", "Kategori", "Jumlah", "Lokasi", "Kadaluarsa", "Dibuat", "Status"]],
+        head: [["No", "Food Name", "Category", "Quantity", "Location", "Expiry Date", "Created", "Status"]],
         body: tableData,
         theme: "grid",
         headStyles: {
@@ -190,25 +188,25 @@ const ReportCard = () => {
         },
         columnStyles: {
           0: { halign: "center", cellWidth: 12 }, // No
-          1: { cellWidth: 35 }, // Nama
-          2: { halign: "center", cellWidth: 25 }, // Kategori
-          3: { halign: "center", cellWidth: 20 }, // Jumlah
-          4: { halign: "center", cellWidth: 25 }, // Lokasi
-          5: { halign: "center", cellWidth: 25 }, // Kadaluarsa
-          6: { halign: "center", cellWidth: 25 }, // Dibuat
+          1: { cellWidth: 35 }, // Name
+          2: { halign: "center", cellWidth: 25 }, // Category
+          3: { halign: "center", cellWidth: 20 }, // Quantity
+          4: { halign: "center", cellWidth: 25 }, // Location
+          5: { halign: "center", cellWidth: 25 }, // Expiry
+          6: { halign: "center", cellWidth: 25 }, // Created
           7: { halign: "center", cellWidth: 23 }, // Status
         },
         didParseCell: (data) => {
           // Color coding for status column
           if (data.column.index === 7) {
             const status = data.cell.text[0]
-            if (status === "Sudah Kadaluarsa") {
+            if (status === "Expired") {
               data.cell.styles.textColor = [220, 38, 38] // Red
               data.cell.styles.fontStyle = "bold"
-            } else if (status === "Hampir Kadaluarsa") {
+            } else if (status === "Near Expiry") {
               data.cell.styles.textColor = [217, 119, 6] // Orange
               data.cell.styles.fontStyle = "bold"
-            } else if (status === "Baik") {
+            } else if (status === "Good") {
               data.cell.styles.textColor = [22, 163, 74] // Green
               data.cell.styles.fontStyle = "bold"
             }
@@ -222,7 +220,6 @@ const ReportCard = () => {
       const pageCount = doc.internal.getNumberOfPages()
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i)
-
         // Footer line
         doc.setDrawColor(...primaryColor)
         doc.setLineWidth(0.5)
@@ -233,19 +230,20 @@ const ReportCard = () => {
         doc.setTextColor(100, 100, 100)
         doc.setFont("helvetica", "normal")
         doc.text("Generated by Food Storage Management System", 14, 292)
-        doc.text(`Halaman ${i} dari ${pageCount}`, 196, 292, { align: "right" })
+        doc.text(`Page ${i} of ${pageCount}`, 196, 292, { align: "right" })
 
         // Company info (optional)
         doc.text("© 2025 Frigora - Food Storage Assistant", 105, 292, { align: "center" })
       }
 
       // Save with better filename
-      const filename = `Laporan_Makanan_${dateRange.from.replace(/-/g, "")}_${dateRange.to.replace(/-/g, "")}.pdf`
+      const filename = `Food_Report_${dateRange.from.replace(/-/g, "")}_${dateRange.to.replace(/-/g, "")}.pdf`
       doc.save(filename)
-      showNotification("success", "Export Berhasil!", `PDF berhasil diunduh: ${filename}`)
+
+      showNotification("success", "Export Successful!", `PDF successfully downloaded: ${filename}`)
     } catch (error) {
       console.error("Error exporting PDF:", error)
-      showNotification("error", "Gagal Export", "Gagal mengekspor PDF. Silakan coba lagi.")
+      showNotification("error", "Export Failed", "Failed to export PDF. Please try again.")
     } finally {
       setIsExporting(false)
     }
@@ -257,7 +255,7 @@ const ReportCard = () => {
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("id-ID", {
+    return new Date(dateString).toLocaleDateString("en-US", {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -350,6 +348,7 @@ const ReportCard = () => {
           </div>
         </div>
       )}
+
       <div className="max-w-7xl mx-auto p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           {/* Header */}
@@ -366,19 +365,18 @@ const ReportCard = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Laporan Penyimpanan Makanan</h1>
-                <p className="text-blue-100 opacity-90">Analisis data makanan berdasarkan periode tertentu</p>
+                <h1 className="text-2xl font-bold">Food Storage Report</h1>
+                <p className="text-blue-100 opacity-90">Analyze food data based on specific periods</p>
               </div>
             </div>
           </div>
 
           {/* Filter Section */}
           <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Periode</h2>
-
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filter Period</h2>
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-end">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Mulai</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Start Date</label>
                 <input
                   type="date"
                   value={dateRange.from}
@@ -386,9 +384,8 @@ const ReportCard = () => {
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tanggal Akhir</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">End Date</label>
                 <input
                   type="date"
                   value={dateRange.to}
@@ -396,7 +393,6 @@ const ReportCard = () => {
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
-
               <div className="flex gap-2">
                 <button
                   onClick={filterByDate}
@@ -422,7 +418,6 @@ const ReportCard = () => {
                     </>
                   )}
                 </button>
-
                 <button
                   onClick={resetFilter}
                   disabled={isLoading}
@@ -438,7 +433,6 @@ const ReportCard = () => {
                   </svg>
                 </button>
               </div>
-
               <div>
                 <button
                   onClick={exportToPDF}
@@ -477,49 +471,40 @@ const ReportCard = () => {
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Total Item</p>
+                        <p className="text-blue-600 dark:text-blue-400 text-sm font-medium">Total Items</p>
                         <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{filteredData.length}</p>
                       </div>
                       <div className="text-2xl">📦</div>
                     </div>
                   </div>
-
                   <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 p-4 rounded-xl border border-green-200 dark:border-green-800">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-600 dark:text-green-400 text-sm font-medium">Kondisi Baik</p>
+                        <p className="text-green-600 dark:text-green-400 text-sm font-medium">Good Condition</p>
                         <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                          {filteredData.filter((item) => getStatus(item.expired_date).text === "Baik").length}
+                          {filteredData.filter((item) => getStatus(item.expired_date).text === "Good").length}
                         </p>
                       </div>
                       <div className="text-2xl">✅</div>
                     </div>
                   </div>
-
                   <div className="bg-gradient-to-br from-yellow-50 to-orange-100 dark:from-yellow-900/20 dark:to-orange-900/20 p-4 rounded-xl border border-yellow-200 dark:border-yellow-800">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">Hampir Kadaluarsa</p>
+                        <p className="text-yellow-600 dark:text-yellow-400 text-sm font-medium">Near Expiry</p>
                         <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-100">
-                          {
-                            filteredData.filter((item) => getStatus(item.expired_date).text === "Hampir Kadaluarsa")
-                              .length
-                          }
+                          {filteredData.filter((item) => getStatus(item.expired_date).text === "Near Expiry").length}
                         </p>
                       </div>
                       <div className="text-2xl">⚠️</div>
                     </div>
                   </div>
-
                   <div className="bg-gradient-to-br from-red-50 to-pink-100 dark:from-red-900/20 dark:to-pink-900/20 p-4 rounded-xl border border-red-200 dark:border-red-800">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-red-600 dark:text-red-400 text-sm font-medium">Sudah Kadaluarsa</p>
+                        <p className="text-red-600 dark:text-red-400 text-sm font-medium">Expired</p>
                         <p className="text-2xl font-bold text-red-900 dark:text-red-100">
-                          {
-                            filteredData.filter((item) => getStatus(item.expired_date).text === "Sudah Kadaluarsa")
-                              .length
-                          }
+                          {filteredData.filter((item) => getStatus(item.expired_date).text === "Expired").length}
                         </p>
                       </div>
                       <div className="text-2xl">🗑️</div>
@@ -534,22 +519,22 @@ const ReportCard = () => {
                       <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Nama
+                            Name
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Kategori
+                            Category
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Jumlah
+                            Quantity
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Lokasi
+                            Location
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Kadaluarsa
+                            Expiry Date
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                            Dibuat
+                            Created
                           </th>
                           <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
                             Status
@@ -587,11 +572,11 @@ const ReportCard = () => {
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span
                                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                                    status.text === "Sudah Kadaluarsa"
+                                    status.text === "Expired"
                                       ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300"
-                                      : status.text === "Hampir Kadaluarsa"
+                                      : status.text === "Near Expiry"
                                         ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300"
-                                        : status.text === "Baik"
+                                        : status.text === "Good"
                                           ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300"
                                           : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                                   }`}
@@ -613,12 +598,12 @@ const ReportCard = () => {
                   <div className="text-4xl">📊</div>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {data.length === 0 ? "Tidak Ada Data" : "Belum Ada Filter"}
+                  {data.length === 0 ? "No Data Available" : "No Filter Applied"}
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400">
                   {data.length === 0
-                    ? "Belum ada data makanan yang tersimpan."
-                    : "Pilih rentang tanggal dan klik Filter untuk melihat laporan."}
+                    ? "No food data has been stored yet."
+                    : "Select a date range and click Filter to view the report."}
                 </p>
               </div>
             )}

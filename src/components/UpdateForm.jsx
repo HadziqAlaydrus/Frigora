@@ -21,11 +21,11 @@ const UpdateForm = () => {
   const [notification, setNotification] = useState(null)
 
   const categories = ["Protein", "Vegetables", "Fruits", "Fast Food", "Frozen Food"]
-  const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "botol", "kaleng", "sachet", "bungkus"]
+  const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "bottle", "can", "sachet", "wrap"]
 
   const showNotification = (type, title, message) => {
     setNotification({ type, title, message })
-    setTimeout(() => setNotification(null), 5000) // Auto hide after 5 seconds
+    setTimeout(() => setNotification(null), 5000)
   }
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const UpdateForm = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true)
-        const res = await axios.get(`http://localhost:5000/api/food/${id}`)
+        const res = await axios.get(`https://backend-frigora.vercel.app/api/food/${id}`)
         const data = res.data
 
         setFormData({
@@ -47,8 +47,8 @@ const UpdateForm = () => {
           expiredDate: data.expired_date ? data.expired_date.split("T")[0] : "",
         })
       } catch (err) {
-        console.error("Gagal memuat data:", err)
-        showNotification("error", "Gagal Memuat Data", "Tidak dapat memuat data makanan. Silakan coba lagi.")
+        console.error("Failed to load data:", err)
+        showNotification("error", "Failed to Load Data", "Unable to load food data. Please try again.")
       } finally {
         setIsLoading(false)
       }
@@ -78,15 +78,13 @@ const UpdateForm = () => {
         expired_date: formData.expiredDate || null,
       })
 
-      showNotification("success", "Berhasil!", "Data makanan berhasil diperbarui.")
-
-      // Delay navigation to show notification
+      showNotification("success", "Success!", "Food data has been successfully updated.")
       setTimeout(() => {
         navigate("/storage")
       }, 2000)
     } catch (err) {
-      console.error("Gagal update:", err)
-      showNotification("error", "Gagal Update", "Terjadi kesalahan saat memperbarui data. Silakan coba lagi.")
+      console.error("Failed to update:", err)
+      showNotification("error", "Update Failed", "An error occurred while updating the data. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -101,7 +99,7 @@ const UpdateForm = () => {
       location: "",
       expiredDate: "",
     })
-    showNotification("info", "Form Direset", "Semua field telah dikosongkan.")
+    showNotification("info", "Form Reset", "All fields have been cleared.")
   }
 
   const handleCancel = () => {
@@ -120,7 +118,7 @@ const UpdateForm = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-12 text-center">
             <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Memuat data makanan...</p>
+            <p className="text-gray-600 dark:text-gray-400">Loading food data...</p>
           </div>
         </div>
       </div>
@@ -129,7 +127,6 @@ const UpdateForm = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4 relative">
-      {/* Notification Popup */}
       {notification && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
           <div
@@ -137,8 +134,8 @@ const UpdateForm = () => {
               notification.type === "success"
                 ? "border-green-500"
                 : notification.type === "error"
-                  ? "border-red-500"
-                  : "border-blue-500"
+                ? "border-red-500"
+                : "border-blue-500"
             } p-4`}
           >
             <div className="flex items-start">
@@ -189,8 +186,8 @@ const UpdateForm = () => {
                     notification.type === "success"
                       ? "text-green-800 dark:text-green-200"
                       : notification.type === "error"
-                        ? "text-red-800 dark:text-red-200"
-                        : "text-blue-800 dark:text-blue-200"
+                      ? "text-red-800 dark:text-red-200"
+                      : "text-blue-800 dark:text-blue-200"
                   }`}
                 >
                   {notification.title}
@@ -211,7 +208,6 @@ const UpdateForm = () => {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 px-6 py-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -225,24 +221,22 @@ const UpdateForm = () => {
               </svg>
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Form Edit Makanan</h2>
-              <p className="text-blue-100 opacity-90">Ubah informasi makanan yang disimpan</p>
+              <h2 className="text-2xl font-bold">Edit Food Form</h2>
+              <p className="text-blue-100 opacity-90">Update your stored food information</p>
             </div>
           </div>
         </div>
 
-        {/* Form Content */}
         <div className="px-6 py-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Nama Makanan */}
             <div className="space-y-2">
               <label htmlFor="foodName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Nama Makanan <span className="text-red-500">*</span>
+                Food Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="foodName"
                 type="text"
-                placeholder="Masukkan nama makanan"
+                placeholder="Enter food name"
                 value={formData.foodName}
                 onChange={(e) => handleInputChange("foodName", e.target.value)}
                 required
@@ -250,10 +244,9 @@ const UpdateForm = () => {
               />
             </div>
 
-            {/* Kategori */}
             <div className="space-y-2">
               <label htmlFor="category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Kategori <span className="text-red-500">*</span>
+                Category <span className="text-red-500">*</span>
               </label>
               <select
                 id="category"
@@ -262,7 +255,7 @@ const UpdateForm = () => {
                 required
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               >
-                <option value="">Pilih kategori makanan</option>
+                <option value="">Select food category</option>
                 {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -271,11 +264,10 @@ const UpdateForm = () => {
               </select>
             </div>
 
-            {/* Jumlah & Satuan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Jumlah <span className="text-red-500">*</span>
+                  Quantity <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="quantity"
@@ -292,7 +284,7 @@ const UpdateForm = () => {
 
               <div className="space-y-2">
                 <label htmlFor="unit" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Satuan <span className="text-red-500">*</span>
+                  Unit <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="unit"
@@ -301,7 +293,7 @@ const UpdateForm = () => {
                   required
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                 >
-                  <option value="">Pilih satuan</option>
+                  <option value="">Select unit</option>
                   {units.map((unit) => (
                     <option key={unit} value={unit}>
                       {unit}
@@ -311,15 +303,14 @@ const UpdateForm = () => {
               </div>
             </div>
 
-            {/* Lokasi Penyimpanan */}
             <div className="space-y-2">
               <label htmlFor="location" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Lokasi Penyimpanan <span className="text-red-500">*</span>
+                Storage Location <span className="text-red-500">*</span>
               </label>
               <input
                 id="location"
                 type="text"
-                placeholder="Contoh: Kulkas, Freezer, Pantry, dll"
+                placeholder="e.g. Fridge, Freezer, Pantry, etc."
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
@@ -327,11 +318,10 @@ const UpdateForm = () => {
               />
             </div>
 
-            {/* Tanggal Kedaluwarsa */}
             <div className="space-y-2">
               <label htmlFor="expiredDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Tanggal Kedaluwarsa
-                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">(Opsional)</span>
+                Expiration Date
+                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">(Optional)</span>
               </label>
               <input
                 id="expiredDate"
@@ -343,7 +333,6 @@ const UpdateForm = () => {
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button
                 type="submit"
@@ -353,7 +342,7 @@ const UpdateForm = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Memperbarui...</span>
+                    <span>Updating...</span>
                   </>
                 ) : (
                   <>
@@ -391,7 +380,7 @@ const UpdateForm = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                <span>Batal</span>
+                <span>Cancel</span>
               </button>
             </div>
           </form>

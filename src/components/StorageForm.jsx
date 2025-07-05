@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 
-// Ambil userId dari token
 const getUserIdFromToken = () => {
   const token = localStorage.getItem("token")
   if (!token) return null
@@ -37,16 +36,16 @@ const StorageForm = () => {
     if (id) {
       setUserId(id)
     } else {
-      showNotification("error", "User belum login", "Silakan login terlebih dahulu untuk menggunakan fitur ini.")
+      showNotification("error", "User not logged in", "Please log in first to use this feature.")
     }
   }, [])
 
   const categories = ["Protein", "Vegetables", "Fruits", "Fast Food", "Frozen Food"]
-  const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "botol", "kaleng", "sachet", "bungkus"]
+  const units = ["kg", "gram", "liter", "ml", "pcs", "pack", "bottle", "can", "sachet", "wrap"]
 
   const showNotification = (type, title, message) => {
     setNotification({ type, title, message })
-    setTimeout(() => setNotification(null), 5000) // Auto hide after 5 seconds
+    setTimeout(() => setNotification(null), 5000)
   }
 
   const handleInputChange = (field, value) => {
@@ -60,7 +59,7 @@ const StorageForm = () => {
     e.preventDefault()
 
     if (!userId) {
-      showNotification("error", "Login Required", "User ID tidak ditemukan. Pastikan sudah login.")
+      showNotification("error", "Login Required", "User ID not found. Make sure you are logged in.")
       return
     }
 
@@ -77,17 +76,16 @@ const StorageForm = () => {
         expired_date: formData.expiredDate || null,
       })
 
-      console.log("Data berhasil disimpan:", response.data)
-      showNotification("success", "Berhasil!", "Data makanan berhasil disimpan ke storage.")
+      console.log("Data saved successfully:", response.data)
+      showNotification("success", "Success!", "Food data successfully saved to storage.")
       handleReset()
 
-      // Delay navigation to show notification
       setTimeout(() => {
         navigate("/storage")
       }, 2000)
     } catch (error) {
-      console.error("Gagal menyimpan data:", error)
-      showNotification("error", "Gagal Menyimpan", "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.")
+      console.error("Failed to save data:", error)
+      showNotification("error", "Failed to Save", "An error occurred while saving data. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -112,7 +110,6 @@ const StorageForm = () => {
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4 relative">
-      {/* Notification Popup */}
       {notification && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
           <div
@@ -194,7 +191,6 @@ const StorageForm = () => {
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 px-6 py-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -208,24 +204,22 @@ const StorageForm = () => {
               </svg>
             </div>
             <div>
-              <h2 className="text-2xl font-bold">Form Penyimpanan Makanan</h2>
-              <p className="text-blue-100 opacity-90">Masukkan informasi makanan yang akan disimpan</p>
+              <h2 className="text-2xl font-bold">Food Storage Form</h2>
+              <p className="text-blue-100 opacity-90">Enter the food information you want to store</p>
             </div>
           </div>
         </div>
 
-        {/* Form Content */}
         <div className="px-6 py-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Nama Makanan */}
             <div className="space-y-2">
               <label htmlFor="foodName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Nama Makanan <span className="text-red-500">*</span>
+                Food Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="foodName"
                 type="text"
-                placeholder="Masukkan nama makanan"
+                placeholder="Enter food name"
                 value={formData.foodName}
                 onChange={(e) => handleInputChange("foodName", e.target.value)}
                 required
@@ -233,10 +227,9 @@ const StorageForm = () => {
               />
             </div>
 
-            {/* Kategori */}
             <div className="space-y-2">
               <label htmlFor="category" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Kategori <span className="text-red-500">*</span>
+                Category <span className="text-red-500">*</span>
               </label>
               <select
                 id="category"
@@ -245,7 +238,7 @@ const StorageForm = () => {
                 required
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
               >
-                <option value="">Pilih kategori makanan</option>
+                <option value="">Select food category</option>
                 {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -254,11 +247,10 @@ const StorageForm = () => {
               </select>
             </div>
 
-            {/* Jumlah & Satuan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="quantity" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Jumlah <span className="text-red-500">*</span>
+                  Quantity <span className="text-red-500">*</span>
                 </label>
                 <input
                   id="quantity"
@@ -275,7 +267,7 @@ const StorageForm = () => {
 
               <div className="space-y-2">
                 <label htmlFor="unit" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Satuan <span className="text-red-500">*</span>
+                  Unit <span className="text-red-500">*</span>
                 </label>
                 <select
                   id="unit"
@@ -284,7 +276,7 @@ const StorageForm = () => {
                   required
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
                 >
-                  <option value="">Pilih satuan</option>
+                  <option value="">Select unit</option>
                   {units.map((unit) => (
                     <option key={unit} value={unit}>
                       {unit}
@@ -294,15 +286,14 @@ const StorageForm = () => {
               </div>
             </div>
 
-            {/* Lokasi Penyimpanan */}
             <div className="space-y-2">
               <label htmlFor="location" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Lokasi Penyimpanan <span className="text-red-500">*</span>
+                Storage Location <span className="text-red-500">*</span>
               </label>
               <input
                 id="location"
                 type="text"
-                placeholder="Contoh: Kulkas, Freezer, Pantry, dll"
+                placeholder="e.g. Fridge, Freezer, Pantry, etc."
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
                 required
@@ -310,11 +301,10 @@ const StorageForm = () => {
               />
             </div>
 
-            {/* Tanggal Kedaluwarsa */}
             <div className="space-y-2">
               <label htmlFor="expiredDate" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Tanggal Kedaluwarsa
-                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">(Opsional)</span>
+                Expiration Date
+                <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">(Optional)</span>
               </label>
               <input
                 id="expiredDate"
@@ -326,7 +316,6 @@ const StorageForm = () => {
               />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button
                 type="submit"
@@ -336,14 +325,14 @@ const StorageForm = () => {
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Menyimpan...</span>
+                    <span>Saving...</span>
                   </>
                 ) : (
                   <>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Simpan Data</span>
+                    <span>Save Data</span>
                   </>
                 )}
               </button>
