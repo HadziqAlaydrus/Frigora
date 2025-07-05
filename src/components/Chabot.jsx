@@ -1,83 +1,72 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { useEffect, useState } from "react"
+import ReactMarkdown from "react-markdown"
 
 const Chatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState("");
+  const [isOpen, setIsOpen] = useState(false)
+  const [input, setInput] = useState("")
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hello! I'm your food storage assistant. Klik tombol di bawah untuk mendapatkan resep dari bahan yang kamu simpan!",
+      text: "Hello! I'm your food storage assistant. Click the button below to get recipes from the ingredients you have stored!",
     },
-  ]);
-  const [userId, setUserId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  ])
+  const [userId, setUserId] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token")
       if (token) {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setUserId(payload.id);
+        const payload = JSON.parse(atob(token.split(".")[1]))
+        setUserId(payload.id)
       }
     } catch (err) {
-      console.error("Token decode error:", err);
+      console.error("Token decode error:", err)
     }
-  }, []);
+  }, [])
 
-  const toggleChat = () => setIsOpen(!isOpen);
+  const toggleChat = () => setIsOpen(!isOpen)
 
   const sendMessage = async (textToSend) => {
-    const text = textToSend?.trim() || input.trim();
-    if (!text) return;
+    const text = textToSend?.trim() || input.trim()
+    if (!text) return
 
-    setMessages((prev) => [...prev, { sender: "user", text }]);
-    setInput("");
-
-    setIsLoading(true);
+    setMessages((prev) => [...prev, { sender: "user", text }])
+    setInput("")
+    setIsLoading(true)
 
     try {
-      let botReply = "";
-
-      if (text.toLowerCase().includes("bahan") || textToSend) {
-        // pakai storage
+      let botReply = ""
+      if (text.toLowerCase().includes("ingredient") || text.toLowerCase().includes("recipe") || textToSend) {
+        // Use storage ingredients
         if (!userId) {
-          botReply =
-            "Silakan login terlebih dahulu untuk mendapatkan resep dari bahan.";
+          botReply = "Please login first to get recipes from your stored ingredients."
         } else {
-          const res = await fetch(
-            `https://backend-frigora.vercel.app/api/gemini/recipe/${userId}`
-          );
-          const data = await res.json();
-          botReply =
-            data.recipe ||
-            "Tidak ada resep yang bisa dibuat dari bahan yang tersedia.";
+          const res = await fetch(`https://backend-frigora.vercel.app/api/gemini/recipe/${userId}`)
+          const data = await res.json()
+          botReply = data.recipe || "No recipes can be made from the available ingredients."
         }
       } else {
-        // pakai input teks
+        // Use text input
         const res = await fetch("https://backend-frigora.vercel.app/api/gemini/text", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
-        });
-        const data = await res.json();
-        botReply =
-          data.recipe || "Resep tidak ditemukan atau AI gagal menjawab.";
+        })
+        const data = await res.json()
+        botReply = data.recipe || "Recipe not found or AI failed to respond."
       }
 
-      setMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
+      setMessages((prev) => [...prev, { sender: "bot", text: botReply }])
     } catch (err) {
-      console.error("Fetch error:", err);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "Terjadi kesalahan saat memanggil AI." },
-      ]);
+      console.error("Fetch error:", err)
+      setMessages((prev) => [...prev, { sender: "bot", text: "An error occurred while calling the AI." }])
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -111,12 +100,7 @@ const Chatbot = () => {
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-5 flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <svg
-                  className="w-7 h-7"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -127,9 +111,7 @@ const Chatbot = () => {
               </div>
               <div>
                 <h3 className="font-bold text-lg">Food Assistant</h3>
-                <p className="text-blue-100 text-sm opacity-90">
-                  Always here to help
-                </p>
+                <p className="text-blue-100 text-sm opacity-90">Always here to help</p>
               </div>
             </div>
             <button
@@ -149,12 +131,7 @@ const Chatbot = () => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-800">
             {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${
-                  msg.sender === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+              <div key={idx} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[280px] px-4 py-3 rounded-2xl text-sm shadow-sm ${
                     msg.sender === "user"
@@ -182,14 +159,12 @@ const Chatbot = () => {
                               {children}
                             </h3>
                           ),
-
                           // Paragraphs
                           p: ({ children }) => (
                             <p className="text-gray-700 dark:text-gray-300 mb-2 last:mb-0 leading-relaxed">
                               {children}
                             </p>
                           ),
-
                           // Lists
                           ul: ({ children }) => (
                             <ul className="list-disc list-inside space-y-1 mb-2 text-gray-700 dark:text-gray-300 ml-2">
@@ -201,12 +176,7 @@ const Chatbot = () => {
                               {children}
                             </ol>
                           ),
-                          li: ({ children }) => (
-                            <li className="text-sm leading-relaxed">
-                              {children}
-                            </li>
-                          ),
-
+                          li: ({ children }) => <li className="text-sm leading-relaxed">{children}</li>,
                           // Code blocks
                           code: ({ inline, children }) => {
                             if (inline) {
@@ -214,7 +184,7 @@ const Chatbot = () => {
                                 <code className="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-xs font-mono border border-gray-200 dark:border-gray-700">
                                   {children}
                                 </code>
-                              );
+                              )
                             }
                             return (
                               <div className="bg-gray-900 dark:bg-gray-950 rounded-lg p-3 mb-2 mt-2 border border-gray-200 dark:border-gray-700">
@@ -222,14 +192,10 @@ const Chatbot = () => {
                                   {children}
                                 </code>
                               </div>
-                            );
+                            )
                           },
-
                           // Pre blocks (for code blocks)
-                          pre: ({ children }) => (
-                            <div className="mb-2">{children}</div>
-                          ),
-
+                          pre: ({ children }) => <div className="mb-2">{children}</div>,
                           // Links
                           a: ({ href, children }) => (
                             <a
@@ -241,14 +207,12 @@ const Chatbot = () => {
                               {children}
                             </a>
                           ),
-
                           // Blockquotes
                           blockquote: ({ children }) => (
                             <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg mb-2 italic text-gray-600 dark:text-gray-400">
                               {children}
                             </blockquote>
                           ),
-
                           // Tables
                           table: ({ children }) => (
                             <div className="overflow-x-auto mb-2">
@@ -267,26 +231,14 @@ const Chatbot = () => {
                               {children}
                             </td>
                           ),
-
                           // Strong/Bold
                           strong: ({ children }) => (
-                            <strong className="font-semibold text-gray-900 dark:text-white">
-                              {children}
-                            </strong>
+                            <strong className="font-semibold text-gray-900 dark:text-white">{children}</strong>
                           ),
-
                           // Emphasis/Italic
-                          em: ({ children }) => (
-                            <em className="italic text-gray-700 dark:text-gray-300">
-                              {children}
-                            </em>
-                          ),
-
+                          em: ({ children }) => <em className="italic text-gray-700 dark:text-gray-300">{children}</em>,
                           // Horizontal rule
-                          hr: () => (
-                            <hr className="border-gray-300 dark:border-gray-600 my-3" />
-                          ),
-
+                          hr: () => <hr className="border-gray-300 dark:border-gray-600 my-3" />,
                           // Images
                           img: ({ src, alt }) => (
                             <img
@@ -330,17 +282,13 @@ const Chatbot = () => {
           {/* Quick Reply */}
           <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
             <button
-              onClick={() =>
-                sendMessage("Berikan resep dari bahan yang dipunya")
-              }
+              onClick={() => sendMessage("Give me recipes from my stored ingredients")}
               disabled={isLoading}
               className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 dark:hover:from-blue-800/40 dark:hover:to-purple-800/40 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center space-x-3">
                 <span className="text-xl">🍳</span>
-                <span className="text-sm font-medium">
-                  Berikan resep dari bahan yang dipunya
-                </span>
+                <span className="text-sm font-medium">Get recipes from my stored ingredients</span>
               </div>
             </button>
           </div>
@@ -350,12 +298,12 @@ const Chatbot = () => {
             <div className="flex space-x-3">
               <input
                 type="text"
-                placeholder="Ketik pesan..."
+                placeholder="Type a message..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !isLoading) {
-                    sendMessage();
+                    sendMessage()
                   }
                 }}
                 disabled={isLoading}
@@ -366,12 +314,7 @@ const Chatbot = () => {
                 disabled={isLoading || !input.trim()}
                 className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 text-white px-4 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -385,7 +328,7 @@ const Chatbot = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default Chatbot;
+export default Chatbot
