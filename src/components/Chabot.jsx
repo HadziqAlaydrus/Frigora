@@ -69,16 +69,16 @@ const Chatbot = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50">
       {/* Chat Toggle Button */}
       <button
         onClick={toggleChat}
         className={`${
           isOpen ? "hidden" : "flex"
-        } bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 text-white px-6 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 items-center space-x-3 group backdrop-blur-sm`}
+        } bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 items-center space-x-2 sm:space-x-3 group backdrop-blur-sm`}
       >
         <svg
-          className="w-6 h-6 group-hover:scale-110 transition-transform duration-200"
+          className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-200"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -90,17 +90,18 @@ const Chatbot = () => {
             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
           />
         </svg>
-        <span className="font-semibold">Food Assistant</span>
+        <span className="font-semibold text-sm sm:text-base hidden xs:block">Food Assistant</span>
+        <span className="font-semibold text-sm sm:text-base xs:hidden">Chat</span>
       </button>
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="absolute bottom-0 right-0 w-96 h-[600px] bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300 backdrop-blur-sm">
+        <div className="fixed inset-0 sm:absolute sm:inset-auto sm:bottom-0 sm:right-0 w-full h-full sm:w-96 sm:h-[600px] bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl border-0 sm:border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300 backdrop-blur-sm z-50">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-5 flex justify-between items-center">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white p-4 sm:p-5 flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -110,15 +111,15 @@ const Chatbot = () => {
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-lg">Food Assistant</h3>
-                <p className="text-blue-100 text-sm opacity-90">Always here to help</p>
+                <h3 className="font-bold text-base sm:text-lg">Food Assistant</h3>
+                <p className="text-blue-100 text-xs sm:text-sm opacity-90">Always here to help</p>
               </div>
             </div>
             <button
               onClick={toggleChat}
               className="text-white hover:bg-white/20 rounded-full p-2 transition-colors duration-200"
             >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -129,11 +130,11 @@ const Chatbot = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-800">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 bg-gray-50 dark:bg-gray-800">
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[280px] px-4 py-3 rounded-2xl text-sm shadow-sm ${
+                  className={`max-w-[85%] sm:max-w-[280px] px-3 sm:px-4 py-2 sm:py-3 rounded-2xl text-sm shadow-sm ${
                     msg.sender === "user"
                       ? "bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-600 dark:to-purple-700 text-white rounded-br-md"
                       : "bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-bl-md"
@@ -145,49 +146,49 @@ const Chatbot = () => {
                         components={{
                           // Headings
                           h1: ({ children }) => (
-                            <h1 className="text-lg font-bold text-gray-900 dark:text-white mb-2 mt-3 first:mt-0">
+                            <h1 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2 mt-3 first:mt-0">
                               {children}
                             </h1>
                           ),
                           h2: ({ children }) => (
-                            <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100 mb-2 mt-3 first:mt-0">
+                            <h2 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-gray-100 mb-2 mt-3 first:mt-0">
                               {children}
                             </h2>
                           ),
                           h3: ({ children }) => (
-                            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 mt-2 first:mt-0">
+                            <h3 className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 mt-2 first:mt-0">
                               {children}
                             </h3>
                           ),
                           // Paragraphs
                           p: ({ children }) => (
-                            <p className="text-gray-700 dark:text-gray-300 mb-2 last:mb-0 leading-relaxed">
+                            <p className="text-gray-700 dark:text-gray-300 mb-2 last:mb-0 leading-relaxed text-xs sm:text-sm">
                               {children}
                             </p>
                           ),
                           // Lists
                           ul: ({ children }) => (
-                            <ul className="list-disc list-inside space-y-1 mb-2 text-gray-700 dark:text-gray-300 ml-2">
+                            <ul className="list-disc list-inside space-y-1 mb-2 text-gray-700 dark:text-gray-300 ml-2 text-xs sm:text-sm">
                               {children}
                             </ul>
                           ),
                           ol: ({ children }) => (
-                            <ol className="list-decimal list-inside space-y-1 mb-2 text-gray-700 dark:text-gray-300 ml-2">
+                            <ol className="list-decimal list-inside space-y-1 mb-2 text-gray-700 dark:text-gray-300 ml-2 text-xs sm:text-sm">
                               {children}
                             </ol>
                           ),
-                          li: ({ children }) => <li className="text-sm leading-relaxed">{children}</li>,
+                          li: ({ children }) => <li className="text-xs sm:text-sm leading-relaxed">{children}</li>,
                           // Code blocks
                           code: ({ inline, children }) => {
                             if (inline) {
                               return (
-                                <code className="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded text-xs font-mono border border-gray-200 dark:border-gray-700">
+                                <code className="bg-gray-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400 px-1 sm:px-1.5 py-0.5 rounded text-xs font-mono border border-gray-200 dark:border-gray-700">
                                   {children}
                                 </code>
                               )
                             }
                             return (
-                              <div className="bg-gray-900 dark:bg-gray-950 rounded-lg p-3 mb-2 mt-2 border border-gray-200 dark:border-gray-700">
+                              <div className="bg-gray-900 dark:bg-gray-950 rounded-lg p-2 sm:p-3 mb-2 mt-2 border border-gray-200 dark:border-gray-700 overflow-x-auto">
                                 <code className="text-green-400 text-xs font-mono block whitespace-pre-wrap leading-relaxed">
                                   {children}
                                 </code>
@@ -202,32 +203,32 @@ const Chatbot = () => {
                               href={href}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-2 transition-colors duration-200"
+                              className="text-blue-500 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 underline underline-offset-2 transition-colors duration-200 text-xs sm:text-sm"
                             >
                               {children}
                             </a>
                           ),
                           // Blockquotes
                           blockquote: ({ children }) => (
-                            <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg mb-2 italic text-gray-600 dark:text-gray-400">
+                            <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-2 sm:pl-3 py-1 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg mb-2 italic text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
                               {children}
                             </blockquote>
                           ),
                           // Tables
                           table: ({ children }) => (
                             <div className="overflow-x-auto mb-2">
-                              <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                              <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden text-xs">
                                 {children}
                               </table>
                             </div>
                           ),
                           th: ({ children }) => (
-                            <th className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
+                            <th className="bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-2 sm:px-3 py-1 sm:py-2 text-left text-xs font-semibold text-gray-700 dark:text-gray-300">
                               {children}
                             </th>
                           ),
                           td: ({ children }) => (
-                            <td className="border-b border-gray-200 dark:border-gray-700 px-3 py-2 text-xs text-gray-600 dark:text-gray-400">
+                            <td className="border-b border-gray-200 dark:border-gray-700 px-2 sm:px-3 py-1 sm:py-2 text-xs text-gray-600 dark:text-gray-400">
                               {children}
                             </td>
                           ),
@@ -253,7 +254,7 @@ const Chatbot = () => {
                       </ReactMarkdown>
                     </div>
                   ) : (
-                    <p className="leading-relaxed">{msg.text}</p>
+                    <p className="leading-relaxed text-xs sm:text-sm">{msg.text}</p>
                   )}
                 </div>
               </div>
@@ -262,7 +263,7 @@ const Chatbot = () => {
             {/* Loading indicator */}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
+                <div className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl rounded-bl-md px-3 sm:px-4 py-2 sm:py-3 shadow-sm">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce"></div>
                     <div
@@ -280,22 +281,22 @@ const Chatbot = () => {
           </div>
 
           {/* Quick Reply */}
-          <div className="px-4 py-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
+          <div className="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
             <button
               onClick={() => sendMessage("Give me recipes from my stored ingredients")}
               disabled={isLoading}
-              className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 dark:hover:from-blue-800/40 dark:hover:to-purple-800/40 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 dark:hover:from-blue-800/40 dark:hover:to-purple-800/40 text-gray-700 dark:text-gray-300 px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 w-full text-left border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <div className="flex items-center space-x-3">
-                <span className="text-xl">🍳</span>
-                <span className="text-sm font-medium">Get recipes from my stored ingredients</span>
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <span className="text-lg sm:text-xl">🍳</span>
+                <span className="text-xs sm:text-sm font-medium">Get recipes from my stored ingredients</span>
               </div>
             </button>
           </div>
 
           {/* Input */}
-          <div className="p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700">
-            <div className="flex space-x-3">
+          <div className="p-3 sm:p-4 bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 safe-area-bottom">
+            <div className="flex space-x-2 sm:space-x-3">
               <input
                 type="text"
                 placeholder="Type a message..."
@@ -307,14 +308,14 @@ const Chatbot = () => {
                   }
                 }}
                 disabled={isLoading}
-                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-xs sm:text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 onClick={() => sendMessage()}
                 disabled={isLoading || !input.trim()}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 text-white px-4 py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 dark:from-blue-600 dark:to-purple-700 dark:hover:from-blue-700 dark:hover:to-purple-800 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-md"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
