@@ -44,7 +44,7 @@ const NavigationBar = () => {
 
     setIsSearching(true);
     try {
-      const url = `http://localhost:5000/api/food/search/${userId}/${searchTerm}`;
+      const url = `https://backend-frigora.vercel.app/api/food/search/${userId}/${searchTerm}`;
       const res = await axios.get(url);
       localStorage.setItem("search_results", JSON.stringify(res.data));
       localStorage.setItem("search_term", searchTerm);
